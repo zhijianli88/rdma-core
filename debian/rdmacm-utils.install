@@ -5,6 +5,8 @@ usr/bin/rdma_client
 usr/bin/rdma_server
 usr/bin/rdma_atomic_write_client
 usr/bin/rdma_atomic_write_server
+usr/bin/rdma_flush_client
+usr/bin/rdma_flush_server
 usr/bin/rdma_xclient
 usr/bin/rdma_xserver
 usr/bin/riostream
