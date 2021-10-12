@@ -823,6 +823,8 @@ done
 %{_bindir}/rdma_server
 %{_bindir}/rdma_atomic_write_client
 %{_bindir}/rdma_atomic_write_server
+%{_bindir}/rdma_flush_client
+%{_bindir}/rdma_flush_server
 %{_bindir}/rdma_xclient
 %{_bindir}/rdma_xserver
 %{_bindir}/riostream

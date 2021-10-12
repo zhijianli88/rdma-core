@@ -24,6 +24,12 @@ target_link_libraries(rdma_client LINK_PRIVATE rdmacm)
 rdma_executable(rdma_server rdma_server.c)
 target_link_libraries(rdma_server LINK_PRIVATE rdmacm)
 
+rdma_executable(rdma_flush_client rdma_flush_client.c)
+target_link_libraries(rdma_flush_client LINK_PRIVATE rdmacm)
+
+rdma_executable(rdma_flush_server rdma_flush_server.c)
+target_link_libraries(rdma_flush_server LINK_PRIVATE rdmacm)
+
 rdma_executable(rdma_xclient rdma_xclient.c)
 target_link_libraries(rdma_xclient LINK_PRIVATE rdmacm)
 
