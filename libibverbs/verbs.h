@@ -517,6 +517,7 @@ enum ibv_wc_opcode {
 	IBV_WC_BIND_MW,
 	IBV_WC_LOCAL_INV,
 	IBV_WC_TSO,
+	IBV_WC_RDMA_FLUSH,
 	IBV_WC_RDMA_ATOMIC_WRITE = 9,
 /*
  * Set value of IBV_WC_RECV so consumers can test if a completion is a
@@ -951,6 +952,7 @@ enum ibv_qp_create_send_ops_flags {
 	IBV_QP_EX_WITH_BIND_MW			= 1 << 8,
 	IBV_QP_EX_WITH_SEND_WITH_INV		= 1 << 9,
 	IBV_QP_EX_WITH_TSO			= 1 << 10,
+	IBV_QP_EX_WITH_RDMA_FLUSH		= 1 << 11,
 	IBV_QP_EX_WITH_RDMA_ATOMIC_WRITE	= 1 << 12,
 };
 
@@ -1098,6 +1100,7 @@ enum ibv_wr_opcode {
 	IBV_WR_SEND_WITH_INV,
 	IBV_WR_TSO,
 	IBV_WR_DRIVER1,
+	IBV_WR_RDMA_FLUSH = 14,
 	IBV_WR_RDMA_ATOMIC_WRITE = 15,
 };
 
@@ -1292,6 +1295,9 @@ struct ibv_qp_ex {
 			     uint64_t remote_addr);
 	void (*wr_rdma_write)(struct ibv_qp_ex *qp, uint32_t rkey,
 			      uint64_t remote_addr);
+	int (*wr_rdma_flush)(struct ibv_qp_ex *qp, uint32_t rkey,
+				  uint64_t remote_addr, size_t len,
+				  uint8_t type, uint8_t level);
 	void (*wr_rdma_write_imm)(struct ibv_qp_ex *qp, uint32_t rkey,
 				  uint64_t remote_addr, __be32 imm_data);
 
@@ -1364,6 +1370,17 @@ static inline void ibv_wr_rdma_write(struct ibv_qp_ex *qp, uint32_t rkey,
 				     uint64_t remote_addr)
 {
 	qp->wr_rdma_write(qp, rkey, remote_addr);
+}
+
+static inline int ibv_wr_rdma_flush(struct ibv_qp_ex *qp, uint32_t rkey,
+				    uint64_t remote_addr, size_t len,
+				    uint8_t type,
+				    uint8_t level)
+{
+	if (!qp->wr_rdma_flush)
+		return -EOPNOTSUPP;
+
+	return qp->wr_rdma_flush(qp, rkey, remote_addr, len, type, level);
 }
 
 static inline void ibv_wr_rdma_write_imm(struct ibv_qp_ex *qp, uint32_t rkey,
