@@ -105,6 +105,16 @@ enum {
 	IB_USER_VERBS_EX_CMD_MODIFY_CQ
 };
 
+enum ib_ext_placement_type {
+	IB_EXT_PLT_GLB_VIS = 1 << 0,
+	IB_EXT_PLT_PERSIST = 1 << 1,
+};
+
+enum ib_ext_selectivity_level {
+	IB_EXT_SEL_MR_RANGE = 0, /* select a MR range */
+	IB_EXT_SEL_MR_WHOLE, /* select the whole MR */
+};
+
 /*
  * Make sure that all structs defined in this file remain laid out so
  * that they pack the same way on 32-bit and 64-bit architectures (to
@@ -466,6 +476,7 @@ enum ib_uverbs_wc_opcode {
 	IB_UVERBS_WC_BIND_MW = 5,
 	IB_UVERBS_WC_LOCAL_INV = 6,
 	IB_UVERBS_WC_TSO = 7,
+	IB_UVERBS_WC_FLUSH = 8,
 };
 
 struct ib_uverbs_wc {
@@ -784,6 +795,7 @@ enum ib_uverbs_wr_opcode {
 	IB_UVERBS_WR_RDMA_READ_WITH_INV = 11,
 	IB_UVERBS_WR_MASKED_ATOMIC_CMP_AND_SWP = 12,
 	IB_UVERBS_WR_MASKED_ATOMIC_FETCH_AND_ADD = 13,
+	IB_UVERBS_WR_RDMA_FLUSH = 14,
 	/* Review enum ib_wr_opcode before modifying this */
 };
 
@@ -1331,6 +1343,8 @@ enum ib_uverbs_device_cap_flags {
 	/* Deprecated. Please use IB_UVERBS_RAW_PACKET_CAP_SCATTER_FCS. */
 	IB_UVERBS_DEVICE_RAW_SCATTER_FCS = 1ULL << 34,
 	IB_UVERBS_DEVICE_PCI_WRITE_END_PADDING = 1ULL << 36,
+	IB_UVERBS_DEVICE_PLT_GLOBAL_VISIBILITY = 1ULL << 38,
+	IB_UVERBS_DEVICE_PLT_PERSISTENT = 1ULL << 39,
 };
 
 enum ib_uverbs_raw_packet_caps {
