@@ -53,6 +53,10 @@ void ibv_wr_rdma_read(struct ibv_qp_ex *qp, uint32_t rkey,
                       uint64_t remote_addr);
 void ibv_wr_rdma_write(struct ibv_qp_ex *qp, uint32_t rkey,
                        uint64_t remote_addr);
+int ibv_wr_rdma_flush(struct ibv_qp_ex *qp, uint32_t rkey,
+                      uint64_t remote_addr, size_t len,
+                      uint32_t type,
+                      uint32_t level);
 void ibv_wr_rdma_write_imm(struct ibv_qp_ex *qp, uint32_t rkey,
                            uint64_t remote_addr, __be32 imm_data);
 
@@ -145,6 +149,7 @@ ibv_qp_init_attr_ex* (see the EXAMPLE below).
 | LOCAL_INV            | ibv_wr_local_inv()        | UC, RC, XRC_SEND                 | NONE     |
 | RDMA_READ            | ibv_wr_rdma_read()        | RC, XRC_SEND                     | DATA, QP |
 | RDMA_WRITE           | ibv_wr_rdma_write()       | UC, RC, XRC_SEND                 | DATA, QP |
+| RDMA_FLUSH           | ibv_wr_rdma_flush()       | RC, RD, XRC_SEND                 | DATA, QP |
 | RDMA_WRITE_WITH_IMM  | ibv_wr_rdma_write_imm()   | UC, RC, XRC_SEND                 | DATA, QP |
 | SEND                 | ibv_wr_send()             | UD, UC, RC, XRC_SEND, RAW_PACKET | DATA, QP |
 | SEND_WITH_IMM        | ibv_wr_send_imm()         | UD, UC, RC, SRC SEND             | DATA, QP |
