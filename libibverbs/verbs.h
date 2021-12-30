@@ -517,6 +517,7 @@ enum ibv_wc_opcode {
 	IBV_WC_BIND_MW,
 	IBV_WC_LOCAL_INV,
 	IBV_WC_TSO,
+	IBV_WC_RDMA_ATOMIC_WRITE = 9,
 /*
  * Set value of IBV_WC_RECV so consumers can test if a completion is a
  * receive by testing (opcode & IBV_WC_RECV).
@@ -1096,6 +1097,7 @@ enum ibv_wr_opcode {
 	IBV_WR_SEND_WITH_INV,
 	IBV_WR_TSO,
 	IBV_WR_DRIVER1,
+	IBV_WR_RDMA_ATOMIC_WRITE = 15,
 };
 
 enum ibv_send_flags {
