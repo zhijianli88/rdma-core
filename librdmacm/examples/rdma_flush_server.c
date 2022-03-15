@@ -195,6 +195,7 @@ out_free_addrinfo:
 }
 
 #define MAP_LEN 0x1fffff
+#define REG_PREFIX "Register MR flush access flags: "
 
 int main(int argc, char **argv)
 {
@@ -202,7 +203,7 @@ int main(int argc, char **argv)
 	char dax_file[1024] = { 0 };
 	int fd = -1;
 
-	while ((op = getopt(argc, argv, "s:p:f:")) != -1) {
+	while ((op = getopt(argc, argv, "s:p:f:t:")) != -1) {
 		switch (op) {
 		case 's':
 			server = optarg;
@@ -214,11 +215,35 @@ int main(int argc, char **argv)
 			// dev dax file
 			strcpy(dax_file, optarg);
 			break;
+		case 't':
+			switch (atoi(optarg)) {
+			case 1:
+				flush_access =
+					IBV_ACCESS_FLUSH_GLOBAL;
+				printf(REG_PREFIX"global visibility\n");
+				break;
+			case 2:
+				flush_access = IBV_ACCESS_FLUSH_PERSISTENT;
+				printf(REG_PREFIX"persistence\n");
+				break;
+			case 3:
+				flush_access =
+					IBV_ACCESS_FLUSH_GLOBAL |
+					IBV_ACCESS_FLUSH_PERSISTENT;
+				printf(REG_PREFIX"global visibility and persistence\n");
+				break;
+			default:
+				flush_access = 0;
+				break;
+			}
+			break;
 		default:
 			printf("usage: %s\n", argv[0]);
 			printf("\t[-s server_address]\n");
 			printf("\t[-p port_number]\n");
-			printf("\t[-f fax file]\n");
+			printf("\t[-f dax file]\n");
+			printf("\t[-t flush access flags, "
+				"1: global visibility, 2: persistence, 3: both]\n");
 			exit(1);
 		}
 	}
@@ -240,7 +265,6 @@ int main(int argc, char **argv)
 			perror("failed to mmap dax_file");
 			return -1;
 		}
-		flush_access |= IBV_ACCESS_FLUSH_PERSISTENT;
 	} else {
 		rdma_write_dest = malloc(MAP_LEN);
 	}

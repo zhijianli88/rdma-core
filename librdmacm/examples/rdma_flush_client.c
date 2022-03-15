@@ -47,6 +47,16 @@ static int send_flags;
 static struct ibv_mr send_msg;
 static struct ibv_mr recv_msg;
 static struct ibv_sge sge = {};
+static int placement_type = IB_FLUSH_GLOBAL;
+static int select_level = IB_FLUSH_RANGE;
+static const char *placement_type_str[4] = {
+	"none", "Global visibility", "Persistence",
+	"Global visibility and Persistence"
+};
+static const char *select_level_str[2] = {
+	"Memory region range",
+	"Whole memory region"
+};
 
 static int run(void)
 {
@@ -228,7 +238,7 @@ static int run(void)
 	ibv_wr_start(qpx);
 	qpx->wr_flags = IBV_SEND_SIGNALED;
 	ret = ibv_wr_rdma_flush(qpx, recv_msg.rkey, (uint64_t)(uintptr_t)recv_msg.addr,
-			src_len, IB_FLUSH_PERSISTENT, IB_FLUSH_RANGE);
+				src_len, placement_type, select_level);
 	ibv_wr_complete(qpx);
 
 	if (ret) {
@@ -270,7 +280,7 @@ int main(int argc, char **argv)
 {
 	int op, ret;
 
-	while ((op = getopt(argc, argv, "s:p:")) != -1) {
+	while ((op = getopt(argc, argv, "s:p:t:l:")) != -1) {
 		switch (op) {
 		case 's':
 			server = optarg;
@@ -278,15 +288,48 @@ int main(int argc, char **argv)
 		case 'p':
 			port = optarg;
 			break;
+		case 't':
+			switch (atoi(optarg)) {
+			case 1:
+				placement_type = IB_FLUSH_GLOBAL;
+				break;
+			case 2:
+				placement_type = IB_FLUSH_PERSISTENT;
+				break;
+			case 3:
+				placement_type = IB_FLUSH_GLOBAL |
+						 IB_FLUSH_PERSISTENT;
+				break;
+			default:
+				placement_type = 0;
+				break;
+			}
+			break;
+		case 'l':
+			switch (atoi(optarg)) {
+			case 0:
+				select_level = IB_FLUSH_RANGE;
+				break;
+			case 1:
+				select_level = IB_FLUSH_MR;
+				break;
+			default:
+				break;
+			}
+			break;
 		default:
 			printf("usage: %s\n", argv[0]);
 			printf("\t[-s server_address]\n");
 			printf("\t[-p port_number]\n");
+			printf("\t[-l select level: 0: memory region range, 1: whole memory region]\n");
+			printf("\t[-t placement type, 1: global visibility, 2: persistence, 3: both]\n");
 			exit(1);
 		}
 	}
 
 	printf("rdma_flush_client: start\n");
+	printf("Placement type: %s\n", placement_type_str[placement_type]);
+	printf("Selectivity level: %s\n", select_level_str[select_level]);
 	ret = run();
 	printf("rdma_flush_client: end %d\n", ret);
 	return ret;
