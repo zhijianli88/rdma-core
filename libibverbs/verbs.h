@@ -951,6 +951,7 @@ enum ibv_qp_create_send_ops_flags {
 	IBV_QP_EX_WITH_BIND_MW			= 1 << 8,
 	IBV_QP_EX_WITH_SEND_WITH_INV		= 1 << 9,
 	IBV_QP_EX_WITH_TSO			= 1 << 10,
+	IBV_QP_EX_WITH_RDMA_ATOMIC_WRITE	= 1 << 12,
 };
 
 struct ibv_rx_hash_conf {
@@ -1285,6 +1286,8 @@ struct ibv_qp_ex {
 			   uint32_t rkey,
 			   const struct ibv_mw_bind_info *bind_info);
 	void (*wr_local_inv)(struct ibv_qp_ex *qp, uint32_t invalidate_rkey);
+	void (*wr_rdma_atomic_write)(struct ibv_qp_ex *qp, uint32_t rkey,
+				     uint64_t remote_addr, void *atomic_wr);
 	void (*wr_rdma_read)(struct ibv_qp_ex *qp, uint32_t rkey,
 			     uint64_t remote_addr);
 	void (*wr_rdma_write)(struct ibv_qp_ex *qp, uint32_t rkey,
@@ -1342,6 +1345,13 @@ static inline void ibv_wr_local_inv(struct ibv_qp_ex *qp,
 				    uint32_t invalidate_rkey)
 {
 	qp->wr_local_inv(qp, invalidate_rkey);
+}
+
+static inline void ibv_wr_rdma_atomic_write(struct ibv_qp_ex *qp,
+					    uint32_t rkey, uint64_t remote_addr,
+					    void *atomic_wr)
+{
+	qp->wr_rdma_atomic_write(qp, rkey, remote_addr, atomic_wr);
 }
 
 static inline void ibv_wr_rdma_read(struct ibv_qp_ex *qp, uint32_t rkey,
