@@ -104,6 +104,12 @@ class QpExXRCSendImm(XRCResources):
             self.qps_num.append((recv_qp.qp_num, send_qp.qp_num))
             self.psns.append(random.getrandbits(24))
 
+class QpExRCRDMAAtomicWrite(RCResources):
+    def create_qps(self):
+        create_qp_ex(self, e.IBV_QPT_RC, e.IBV_QP_EX_WITH_RDMA_ATOMIC_WRITE)
+
+    def create_mr(self):
+        self.mr = u.create_custom_mr(self, e.IBV_ACCESS_REMOTE_WRITE)
 
 class QpExRCRDMAWrite(RCResources):
     def create_qps(self):
@@ -163,6 +169,7 @@ class QpExTestCase(RDMATestCase):
                         'xrc_send': QpExXRCSend, 'ud_send_imm': QpExUDSendImm,
                         'rc_send_imm': QpExRCSendImm,
                         'xrc_send_imm': QpExXRCSendImm,
+                        'rc_atomic_write': QpExRCRDMAAtomicWrite,
                         'rc_write': QpExRCRDMAWrite,
                         'rc_write_imm': QpExRCRDMAWriteImm,
                         'rc_read': QpExRCRDMARead,
@@ -220,6 +227,17 @@ class QpExTestCase(RDMATestCase):
     def test_qp_ex_xrc_send_imm(self):
         client, server = self.create_players('xrc_send_imm')
         u.xrc_traffic(client, server, send_op=e.IBV_QP_EX_WITH_SEND_WITH_IMM)
+
+    def test_qp_ex_rc_rdma_atomic_write(self):
+        client, server = self.create_players('rc_atomic_write')
+        client.msg_size = 8
+        server.msg_size = 8
+        client.rkey = server.mr.rkey
+        server.rkey = client.mr.rkey
+        client.raddr = server.mr.buf
+        server.raddr = client.mr.buf
+        u.rdma_traffic(client, server, self.iters, self.gid_index, self.ib_port,
+                       new_send=True, send_op=e.IBV_QP_EX_WITH_RDMA_ATOMIC_WRITE)
 
     def test_qp_ex_rc_rdma_write(self):
         client, server = self.create_players('rc_write')
