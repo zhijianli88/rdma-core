@@ -12,6 +12,12 @@ target_link_libraries(mckey LINK_PRIVATE rdmacm ${CMAKE_THREAD_LIBS_INIT} rdmacm
 rdma_executable(rcopy rcopy.c)
 target_link_libraries(rcopy LINK_PRIVATE rdmacm rdmacm_tools)
 
+rdma_executable(rdma_atomic_write_client rdma_atomic_write_client.c)
+target_link_libraries(rdma_atomic_write_client LINK_PRIVATE rdmacm ibverbs)
+
+rdma_executable(rdma_atomic_write_server rdma_atomic_write_server.c)
+target_link_libraries(rdma_atomic_write_server LINK_PRIVATE rdmacm)
+
 rdma_executable(rdma_client rdma_client.c)
 target_link_libraries(rdma_client LINK_PRIVATE rdmacm)
 
