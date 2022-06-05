@@ -127,6 +127,8 @@ Files: librdmacm/examples/cmtime.c
        librdmacm/examples/rcopy.c
        librdmacm/examples/rdma_client.c
        librdmacm/examples/rdma_server.c
+       librdmacm/examples/rdma_atomic_write_client.c
+       librdmacm/examples/rdma_atomic_write_server.c
        librdmacm/examples/rdma_xclient.c
        librdmacm/examples/rdma_xserver.c
        librdmacm/examples/riostream.c
